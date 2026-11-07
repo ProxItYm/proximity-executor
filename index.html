@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Proximity Executor</title>
+<meta name="description" content="Proximity Executor — a clean, fast Luau executor for Windows.">
+<link rel="icon" href="logo.png">
+<style>
+  :root{
+    --bg:#000; --panel:#0a0a0c; --panel2:#070709;
+    --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.14);
+    --text:#f0f0f4; --dim:#9a9aa6; --faint:#6a6a76;
+    --a:#7dd8ff; --b:#c6f0ff;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--a);text-decoration:none}
+  a:hover{color:var(--b)}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+  header{border-bottom:1px solid var(--line)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:72px}
+  .brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:.12em;font-size:15px}
+  .brand img{width:34px;height:34px;border-radius:8px}
+  .nav a.navlink{color:var(--dim);font-size:14px;font-weight:600;margin-left:22px}
+  .nav a.navlink:hover{color:var(--text)}
+
+  .hero{padding:96px 0 72px;text-align:center}
+  .hero img.logo{width:132px;height:132px;border-radius:24px;box-shadow:0 0 0 1px var(--line2),0 30px 80px rgba(125,216,255,.12)}
+  h1{font-size:58px;letter-spacing:.16em;margin:34px 0 0;font-weight:800}
+  h1 span{background:linear-gradient(90deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .tag{color:var(--dim);font-size:17px;margin:14px auto 0;max-width:560px;line-height:1.6}
+  .meta{color:var(--faint);font-size:13px;margin-top:14px;letter-spacing:.04em}
+
+  .actions{display:flex;gap:14px;justify-content:center;margin-top:36px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:10px;padding:15px 30px;border-radius:12px;
+       font-weight:700;font-size:15px;border:1px solid transparent;transition:.15s}
+  .btn.primary{background:linear-gradient(120deg,var(--a),var(--b));color:#041017;
+       box-shadow:0 10px 40px rgba(125,216,255,.18)}
+  .btn.primary:hover{filter:brightness(1.06);transform:translateY(-1px);color:#041017}
+  .btn.ghost{border-color:var(--line2);color:var(--text);background:rgba(255,255,255,.02)}
+  .btn.ghost:hover{background:rgba(255,255,255,.06)}
+
+  section{padding:56px 0;border-top:1px solid var(--line)}
+  h2{font-size:24px;margin:0 0 8px;letter-spacing:.02em}
+  .sub{color:var(--dim);margin:0 0 32px;font-size:15px}
+
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px}
+  .card h3{margin:0 0 8px;font-size:16px}
+  .card p{margin:0;color:var(--dim);font-size:14px;line-height:1.65}
+  .card .ico{width:34px;height:34px;border-radius:10px;background:rgba(125,216,255,.1);
+       border:1px solid rgba(125,216,255,.25);display:grid;place-items:center;margin-bottom:16px;
+       color:var(--a);font-weight:800;font-size:14px}
+
+  .steps{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;counter-reset:s}
+  .step{display:flex;gap:16px;background:var(--panel);border:1px solid var(--line);
+       border-radius:16px;padding:22px}
+  .step .n{flex:0 0 34px;height:34px;border-radius:50%;border:1px solid rgba(125,216,255,.35);
+       color:var(--a);display:grid;place-items:center;font-weight:800;font-size:14px}
+  .step p{margin:2px 0 0;color:var(--dim);font-size:14px;line-height:1.6}
+  .step b{color:var(--text);font-weight:700}
+
+  details{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:0 18px;margin-bottom:10px}
+  details summary{cursor:pointer;padding:18px 0;font-weight:600;font-size:15px;list-style:none}
+  details summary::-webkit-details-marker{display:none}
+  details summary:after{content:"+";float:right;color:var(--a);font-weight:700}
+  details[open] summary:after{content:"–"}
+  details p{color:var(--dim);font-size:14px;line-height:1.7;margin:0 0 18px}
+
+  footer{border-top:1px solid var(--line);padding:34px 0;color:var(--faint);font-size:13px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+
+  @media(max-width:860px){
+    .grid{grid-template-columns:1fr}
+    .steps{grid-template-columns:1fr}
+    h1{font-size:40px}
+    .hero{padding:70px 0 56px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <div class="brand"><img src="logo.png" alt="">PROXIMITY</div>
+    <nav>
+      <a class="navlink" href="#download">Download</a>
+      <a class="navlink" href="#steps">Setup</a>
+      <a class="navlink" href="https://discord.gg/8TgCqcyJtn" target="_blank" rel="noopener">Discord</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="hero" id="download">
+    <img class="logo" src="logo.png" alt="Proximity">
+    <h1><span>PROXIMITY</span></h1>
+    <p class="tag">A clean, fast Luau executor for Windows. One single .exe — no installer, no zip, no extra files.</p>
+    <p class="meta">WINDOWS 10 / 11 &nbsp;·&nbsp; KEY IN DISCORD &nbsp;·&nbsp; FREE</p>
+
+    <div class="actions">
+      <a class="btn primary" href="https://github.com/maxyyys1/proximity-executor/releases/download/v1.0.0/Proximity.exe">
+        Download .exe
+      </a>
+      <a class="btn ghost" href="https://discord.gg/8TgCqcyJtn" target="_blank" rel="noopener">
+        Get a key — Discord
+      </a>
+    </div>
+  </div>
+
+  <section id="steps">
+    <h2>Setup</h2>
+    <p class="sub">Four steps, about a minute.</p>
+    <div class="steps">
+      <div class="step"><div class="n">1</div><div><b>Download the .exe</b><p>One file, about 18 MB. No zip to extract, nothing else to install.</p></div></div>
+      <div class="step"><div class="n">2</div><div><b>Run as administrator</b><p>Double-click <code>Proximity.exe</code> and accept the prompt.</p></div></div>
+      <div class="step"><div class="n">3</div><div><b>Enter your key</b><p>Grab one in the Discord, paste it, press Activate.</p></div></div>
+      <div class="step"><div class="n">4</div><div><b>Attach &amp; execute</b><p>Launch Roblox, join a game, press Attach, then Execute.</p></div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Features</h2>
+    <p class="sub">Everything you need, nothing you don't.</p>
+    <div class="grid">
+      <div class="card"><div class="ico">↯</div><h3>Fast attach</h3><p>Multi-client support with a live client list and one-click attach.</p></div>
+      <div class="card"><div class="ico">⌘</div><h3>Editor + console</h3><p>Write or paste scripts in-app, run with Execute, watch the console.</p></div>
+      <div class="card"><div class="ico">◐</div><h3>Clean UI</h3><p>Pure black, light blue, no clutter. Frameless window, custom everything.</p></div>
+      <div class="card"><div class="ico">⚿</div><h3>Key system</h3><p>Keys are free in the Discord. Paste once and it stays activated.</p></div>
+      <div class="card"><div class="ico">◎</div><h3>No clutter in-game</h3><p>No watermark spam, no notification banners covering your screen.</p></div>
+      <div class="card"><div class="ico">↻</div><h3>Kept updated</h3><p>New builds posted for every Roblox update. Grab them from the Discord.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>FAQ</h2>
+    <p class="sub">Quick answers.</p>
+    <details open>
+      <summary>Where do I get a key?</summary>
+      <p>Keys are free in the Discord: <a href="https://discord.gg/8TgCqcyJtn" target="_blank" rel="noopener">discord.gg/8TgCqcyJtn</a>. Paste it into the key field and press Activate.</p>
+    </details>
+    <details>
+      <summary>Windows Defender flagged it.</summary>
+      <p>It's an unsigned executable. Add the .exe to your exclusions, then download it again if Windows removed it.</p>
+    </details>
+    <details>
+      <summary>Attach does nothing.</summary>
+      <p>Make sure Roblox was launched from roblox.com and you're inside a game (not the menu). Close any other executor first — they use the same local port.</p>
+    </details>
+    <details>
+      <summary>Does it work after a Roblox update?</summary>
+      <p>The engine needs to be updated for each new Roblox build. Updates are dropped in the Discord.</p>
+    </details>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span>Proximity Executor — West Products</span>
+    <span><a href="https://discord.gg/8TgCqcyJtn" target="_blank" rel="noopener">Discord</a></span>
+  </div>
+</footer>
+
+</body>
+</html>
